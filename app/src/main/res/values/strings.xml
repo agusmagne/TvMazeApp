@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TvMazeApp</string>
+    <string name="main_activity_description">Find your favourite series or movies</string>
 </resources>
