@@ -1,15 +1,11 @@
 package com.example.tvmazeapp.view
 
-import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AnimationUtils
-import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -29,6 +25,7 @@ class MainActivity : AppCompatActivity(), MainView {
     private var titleTxt: TextView? = null
     private var imageview: ImageView? = null
     private var premieredTxt: TextView? = null
+    private var noResultsTxt: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +47,22 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun makeToast(message: String) =
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
+    override fun handleShowVisibility(isTvShowVisible: Boolean) {
+        if (isTvShowVisible) {
+            imageview?.visibility = View.VISIBLE
+            titleTxt?.visibility = View.VISIBLE
+            premieredTxt?.visibility = View.VISIBLE
+            noResultsTxt?.visibility = View.INVISIBLE
+            animate(imageview)
+        } else {
+            imageview?.visibility = View.INVISIBLE
+            titleTxt?.visibility = View.INVISIBLE
+            premieredTxt?.visibility = View.INVISIBLE
+            noResultsTxt?.visibility = View.VISIBLE
+            animate(noResultsTxt)
+        }
+    }
+
     private fun bindTvShow(tvShowPair: Pair<TvShow, Bitmap?>) {
         titleTxt?.text = tvShowPair.first.name
         premieredTxt?.text = tvShowPair.first.premiered
@@ -62,7 +75,7 @@ class MainActivity : AppCompatActivity(), MainView {
             } else {
                 Glide.with(this).load(tvShowPair.second).into(it)
                 hideProgress()
-                animate()
+                handleShowVisibility(true)
             }
         }
     }
@@ -73,14 +86,15 @@ class MainActivity : AppCompatActivity(), MainView {
         premieredTxt = findViewById(R.id.premiered_txt)
         progressbar = findViewById(R.id.progressbar)
         imageview = findViewById(R.id.imageview)
+        noResultsTxt = findViewById(R.id.no_results_found_txt)
     }
 
-    private fun animate() {
+    private fun animate(view: View?) {
         val anim1 = AnimatorInflater.loadAnimator(this, R.animator.resize_alpha)
         val anim2 = AnimatorInflater.loadAnimator(this, R.animator.regain_alpha)
         val set = AnimatorSet()
         set.playTogether(anim1, anim2)
-        set.setTarget(imageview)
+        set.setTarget(view)
         set.start()
     }
 
@@ -110,7 +124,7 @@ class MainActivity : AppCompatActivity(), MainView {
             isFirstResource: Boolean
         ): Boolean {
             viewModel?.storeInCache(tvShow, resource)
-            animate()
+            handleShowVisibility(true)
             return false
         }
     }

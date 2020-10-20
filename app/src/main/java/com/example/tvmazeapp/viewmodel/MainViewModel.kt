@@ -18,15 +18,23 @@ import org.joda.time.Days
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.properties.Delegates
 
 class MainViewModel(private val view: MainView) : ViewModel() {
 
     val liveData = MutableLiveData<Pair<TvShow, Bitmap?>>()
 
-    private val maxCacheSize = Utils.getCacheMaxSize(view as Context)
-    private val tvShowBitmapCache = TvShowBitmapCache(maxCacheSize)
-    private val tvShowCache = LruCache<String, TvShow>(maxCacheSize / 100)
-    private var inputString = ""
+    private var maxCacheSize: Int
+    private val tvShowBitmapCache: TvShowBitmapCache
+    private val tvShowCache: LruCache<String, TvShow>
+    private var inputString: String
+
+    init {
+        maxCacheSize = Utils.getCacheMaxSize(view as Context)
+        tvShowBitmapCache = TvShowBitmapCache(maxCacheSize)
+        tvShowCache = LruCache<String, TvShow>(maxCacheSize / 100)
+        inputString = ""
+    }
 
     fun getTvShow(inputString: String) {
         view.showProgress()
@@ -52,9 +60,9 @@ class MainViewModel(private val view: MainView) : ViewModel() {
 
     private val getTvShowCallback = object : Callback<TvShow> {
         override fun onResponse(call: Call<TvShow>, response: Response<TvShow>) {
-            response.body()?.let {
-                view.hideProgress()
-                val tvShowRaw = it
+            val tvShowRaw = response.body()
+            view.hideProgress()
+            if (tvShowRaw != null) {
                 tvShowRaw.premiered = calculatePremieredDays(tvShowRaw.premiered)
                 val pair = if (tvShowBitmapCache[tvShowRaw.id] == null) {
                     Pair(tvShowRaw, null)
@@ -62,6 +70,8 @@ class MainViewModel(private val view: MainView) : ViewModel() {
                     Pair(tvShowRaw, tvShowBitmapCache[tvShowRaw.id])
                 }
                 liveData.value = pair
+            } else {
+                view.handleShowVisibility(false)
             }
         }
 

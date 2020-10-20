@@ -89,6 +89,18 @@
             app:layout_constraintRight_toRightOf="@id/imageview"
             app:layout_constraintTop_toTopOf="@id/imageview" />
 
+        <TextView
+            android:id="@+id/no_results_found_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="No results found"
+            android:textSize="22sp"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/imageview" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
