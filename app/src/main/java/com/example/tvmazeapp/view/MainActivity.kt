@@ -1,9 +1,15 @@
 package com.example.tvmazeapp.view
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -56,6 +62,7 @@ class MainActivity : AppCompatActivity(), MainView {
             } else {
                 Glide.with(this).load(tvShowPair.second).into(it)
                 hideProgress()
+                animate()
             }
         }
     }
@@ -66,6 +73,15 @@ class MainActivity : AppCompatActivity(), MainView {
         premieredTxt = findViewById(R.id.premiered_txt)
         progressbar = findViewById(R.id.progressbar)
         imageview = findViewById(R.id.imageview)
+    }
+
+    private fun animate() {
+        val anim1 = AnimatorInflater.loadAnimator(this, R.animator.resize_alpha)
+        val anim2 = AnimatorInflater.loadAnimator(this, R.animator.regain_alpha)
+        val set = AnimatorSet()
+        set.playTogether(anim1, anim2)
+        set.setTarget(imageview)
+        set.start()
     }
 
     private fun setSearchListener() {
@@ -94,6 +110,7 @@ class MainActivity : AppCompatActivity(), MainView {
             isFirstResource: Boolean
         ): Boolean {
             viewModel?.storeInCache(tvShow, resource)
+            animate()
             return false
         }
     }
