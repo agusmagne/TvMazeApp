@@ -7,6 +7,7 @@ import androidx.collection.LruCache
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.tvmazeapp.R
 import com.example.tvmazeapp.cache.TvShowBitmapCache
 import com.example.tvmazeapp.model.TvShow
 import com.example.tvmazeapp.services.TvMazeEndpoints
@@ -18,7 +19,6 @@ import org.joda.time.Days
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.properties.Delegates
 
 class MainViewModel(private val view: MainView) : ViewModel() {
 
@@ -37,17 +37,22 @@ class MainViewModel(private val view: MainView) : ViewModel() {
     }
 
     fun getTvShow(inputString: String) {
-        view.showProgress()
-        this.inputString = inputString
-        if (tvShowCache[inputString] != null) {
-            // do not call the api at all
-            val tvShow = tvShowCache[inputString]!!
-            val bitmap = tvShowBitmapCache[tvShow.id]
-            liveData.value = Pair(tvShow, bitmap)
+        if (inputString.isNotBlank()) {
+            view.showProgress()
+            this.inputString = inputString
+            if (tvShowCache[inputString] != null) {
+                // do not call the api at all
+                val tvShow = tvShowCache[inputString]!!
+                val bitmap = tvShowBitmapCache[tvShow.id]
+                liveData.value = Pair(tvShow, bitmap)
 
+            } else {
+                val service = TvMazeService.getService().create(TvMazeEndpoints::class.java)
+                val call = service.getTvShow(inputString)
+                call.enqueue(getTvShowCallback)
+            }
         } else {
-            val service = TvMazeService.getService().create(TvMazeEndpoints::class.java)
-            service.getTvShow(inputString).enqueue(getTvShowCallback)
+            view.makeToast((view as Context).getString(R.string.ERROR_EMPTY_EDTXT))
         }
     }
 
@@ -77,7 +82,7 @@ class MainViewModel(private val view: MainView) : ViewModel() {
 
         override fun onFailure(call: Call<TvShow>, t: Throwable) {
             view.hideProgress()
-            view.makeToast("Error trying to get repositories")
+            view.makeToast((view as Context).getString(R.string.SERVICE_ERROR))
             println(t.message)
             println(t.localizedMessage)
         }

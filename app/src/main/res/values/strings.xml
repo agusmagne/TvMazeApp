@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TvMazeApp</string>
     <string name="main_activity_description">Find your favourite series or movies</string>
+    <string name="SERVICE_ERROR">Error trying to get repositories</string>
+    <string name="ERROR_EMPTY_EDTXT">You have to enter a show name</string>
+    <string name="default_value">Default value</string>
 </resources>

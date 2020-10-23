@@ -5,7 +5,8 @@ import android.content.Context
 
 object Utils {
 
-    fun getCacheMaxSize(context: Context): Int = ((context.getSystemService(Context.ACTIVITY_SERVICE)
-            as ActivityManager).memoryClass * 1024 * 1024) / 8
+    fun getCacheMaxSize(context: Context): Int =
+        ((context.getSystemService(Context.ACTIVITY_SERVICE)
+                as ActivityManager).memoryClass * 1024 * 1024) / 8
 
 }
