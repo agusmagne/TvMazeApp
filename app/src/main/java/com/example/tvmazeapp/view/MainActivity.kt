@@ -9,7 +9,8 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
+import androidx.lifecycle.observe
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -30,11 +31,19 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
     lateinit var providersFactory: ViewModelProvidersFactory
     private lateinit var viewModel2: MainViewModel2
 
+    @Inject
+    @JvmField
+    var logo: Drawable? = null
+
+    @Inject
+    lateinit var glideRequestManager: RequestManager
+
     private var viewModel: MainViewModel? = null
     private var progressbar: ProgressBar? = null
     private var edtxt: EditText? = null
     private var titleTxt: TextView? = null
-    private var imageview: ImageView? = null
+    private var logoImageView: ImageView? = null
+    private var tvShowImageView: ImageView? = null
     private var premieredTxt: TextView? = null
     private var noResultsTxt: TextView? = null
 
@@ -43,8 +52,10 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
         setContentView(R.layout.activity_main)
         initViews()
         setSearchListener()
+        loadIconDrawable()
+
         viewModel = MainViewModel(this)
-//        viewModel?.liveData?.observe(this, { tvShowPair -> bindTvShow(tvShowPair) })
+        viewModel?.liveData?.observe(this) { tvShowPair -> bindTvShow(tvShowPair) }
         viewModel2 = ViewModelProvider(this, providersFactory).get(MainViewModel2::class.java)
         Log.d(TAG, "onCreate: ${viewModel2.string}")
 
@@ -63,13 +74,13 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
 
     override fun handleShowVisibility(isTvShowVisible: Boolean) {
         if (isTvShowVisible) {
-            imageview?.visibility = View.VISIBLE
+            tvShowImageView?.visibility = View.VISIBLE
             titleTxt?.visibility = View.VISIBLE
             premieredTxt?.visibility = View.VISIBLE
             noResultsTxt?.visibility = View.INVISIBLE
-            animate(imageview)
+            animate(tvShowImageView)
         } else {
-            imageview?.visibility = View.INVISIBLE
+            tvShowImageView?.visibility = View.INVISIBLE
             titleTxt?.visibility = View.INVISIBLE
             premieredTxt?.visibility = View.INVISIBLE
             noResultsTxt?.visibility = View.VISIBLE
@@ -77,17 +88,25 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
         }
     }
 
+    private fun loadIconDrawable() = logoImageView?.let {
+        glideRequestManager.load(logo).into(it)
+    }
+
     private fun bindTvShow(tvShowPair: Pair<TvShow, Bitmap?>) {
         titleTxt?.text = tvShowPair.first.name
         premieredTxt?.text = tvShowPair.first.premiered
-        imageview?.let {
+        tvShowImageView?.let {
             if (tvShowPair.second == null) {
-                Glide.with(this)
-                    .load(tvShowPair.first.image.original)
-                    .listener(imageviewCallback(tvShowPair.first))
-                    .into(it)
+                tvShowPair.first.image?.original?.let { uri ->
+                    glideRequestManager
+                        .load(uri)
+                        .listener(imageviewCallback(tvShowPair.first))
+                        .into(it)
+                }
             } else {
-                Glide.with(this).load(tvShowPair.second).into(it)
+                tvShowPair.second?.let { bitmap ->
+                    glideRequestManager.load(bitmap).into(it)
+                }
                 hideProgress()
                 handleShowVisibility(true)
             }
@@ -99,7 +118,8 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
         titleTxt = findViewById(R.id.title_txt)
         premieredTxt = findViewById(R.id.premiered_txt)
         progressbar = findViewById(R.id.progressbar)
-        imageview = findViewById(R.id.imageview)
+        logoImageView = findViewById(R.id.icon)
+        tvShowImageView = findViewById(R.id.imageview)
         noResultsTxt = findViewById(R.id.no_results_found_txt)
     }
 
