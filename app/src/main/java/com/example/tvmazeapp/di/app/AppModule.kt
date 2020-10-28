@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.example.tvmazeapp.R
+import com.example.tvmazeapp.utils.Utils
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -16,6 +17,11 @@ class AppModule {
 
     @Module
     companion object {
+
+        @Singleton
+        @Provides
+        @JvmStatic
+        fun provideUtilsClass(application: Application): Utils = Utils(application)
 
         @Singleton
         @Provides

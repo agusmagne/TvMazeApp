@@ -55,8 +55,8 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
         loadIconDrawable()
 
         viewModel = MainViewModel(this)
-        viewModel?.liveData?.observe(this) { tvShowPair -> bindTvShow(tvShowPair) }
         viewModel2 = ViewModelProvider(this, providersFactory).get(MainViewModel2::class.java)
+        viewModel2.liveData.observe(this) { tvShowPair -> bindTvShow(tvShowPair) }
         Log.d(TAG, "onCreate: ${viewModel2.string}")
 
     }
@@ -95,6 +95,11 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
     private fun bindTvShow(tvShowPair: Pair<TvShow, Bitmap?>) {
         titleTxt?.text = tvShowPair.first.name
         premieredTxt?.text = tvShowPair.first.premiered
+        loadBitmap(tvShowPair)
+
+    }
+
+    private fun loadBitmap(tvShowPair: Pair<TvShow, Bitmap?>) {
         tvShowImageView?.let {
             if (tvShowPair.second == null) {
                 tvShowPair.first.image?.original?.let { uri ->
@@ -105,7 +110,9 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
                 }
             } else {
                 tvShowPair.second?.let { bitmap ->
-                    glideRequestManager.load(bitmap).into(it)
+                    glideRequestManager
+                        .load(bitmap)
+                        .into(it)
                 }
                 hideProgress()
                 handleShowVisibility(true)
@@ -134,7 +141,8 @@ class MainActivity : DaggerAppCompatActivity(), MainView {
 
     private fun setSearchListener() {
         edtxt?.setOnEditorActionListener { textView, i, keyEvent ->
-            viewModel?.getTvShow(textView.text.toString().trim())
+//            viewModel?.getTvShow(textView.text.toString().trim())
+            viewModel2.getTvShowData(textView.text.toString().trim())
             false
         }
     }
