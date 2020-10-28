@@ -32,7 +32,7 @@ class MainViewModel(private val view: MainView) : ViewModel() {
     init {
         maxCacheSize = Utils.getCacheMaxSize(view as Context)
         tvShowBitmapCache = TvShowBitmapCache(maxCacheSize)
-        tvShowCache = LruCache<String, TvShow>(maxCacheSize / 100)
+        tvShowCache = LruCache(maxCacheSize / 100)
         inputString = ""
     }
 

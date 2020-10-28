@@ -5,9 +5,10 @@ import android.animation.AnimatorSet
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -16,8 +17,18 @@ import com.bumptech.glide.request.target.Target
 import com.example.tvmazeapp.R
 import com.example.tvmazeapp.model.TvShow
 import com.example.tvmazeapp.viewmodel.MainViewModel
+import com.example.tvmazeapp.viewmodel.MainViewModel2
+import com.example.tvmazeapp.viewmodels.ViewModelProvidersFactory
+import dagger.android.support.DaggerAppCompatActivity
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity : DaggerAppCompatActivity(), MainView {
+
+    private val TAG = MainActivity::class.qualifiedName
+
+    @Inject
+    lateinit var providersFactory: ViewModelProvidersFactory
+    private lateinit var viewModel2: MainViewModel2
 
     private var viewModel: MainViewModel? = null
     private var progressbar: ProgressBar? = null
@@ -33,7 +44,10 @@ class MainActivity : AppCompatActivity(), MainView {
         initViews()
         setSearchListener()
         viewModel = MainViewModel(this)
-        viewModel?.liveData?.observe(this, { tvShowPair -> bindTvShow(tvShowPair) })
+//        viewModel?.liveData?.observe(this, { tvShowPair -> bindTvShow(tvShowPair) })
+        viewModel2 = ViewModelProvider(this, providersFactory).get(MainViewModel2::class.java)
+        Log.d(TAG, "onCreate: ${viewModel2.string}")
+
     }
 
     override fun showProgress() {

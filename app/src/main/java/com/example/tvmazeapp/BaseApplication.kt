@@ -1,6 +1,6 @@
 package com.example.tvmazeapp
 
-import com.example.tvmazeapp.di.DaggerAppComponent
+import com.example.tvmazeapp.di.app.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 

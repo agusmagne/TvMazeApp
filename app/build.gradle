@@ -53,4 +53,10 @@ dependencies {
     implementation 'com.google.dagger:dagger-android-support:2.15' // if you use the support libraries
     kapt 'com.google.dagger:dagger-android-processor:2.15'
 
+    // ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+    // LiveData
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+
+
 }
